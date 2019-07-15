@@ -1,0 +1,67 @@
+Browser base64 Session Description <textarea id="localSessionDescription" readonly="true"></textarea> <br />
+Golang base64 Session Description: <textarea id="remoteSessionDescription"></textarea> <br />
+<button onclick="window.startSession()"> Start Session </button> <br />
+<br />
+
+Message: <textarea id="message">This is my DataChannel message!</textarea> <br />
+<button onclick="window.sendMessage()"> Send Message </button> <br />
+<img src="#" id="stream">
+<div id="logs"></div>
+
+<script>
+  /* eslint-env browser */
+
+let pc = new RTCPeerConnection({
+  iceServers: [
+    {
+      urls: 'stun:stun.l.google.com:19302'
+    }
+  ]
+})
+let log = msg => {
+  document.getElementById('logs').innerHTML += msg + '<br>'
+}
+
+let sendChannel = pc.createDataChannel('foo')
+sendChannel.onclose = () => console.log('sendChannel has closed')
+sendChannel.onopen = () => console.log('sendChannel has opened')
+sendChannel.onmessage = e => {
+    console.log(e.data)
+    var imageUrl = URL.createObjectURL(e.data);
+    var img = document.querySelector( "#stream" );
+    img.src = imageUrl;
+}
+
+pc.oniceconnectionstatechange = e => log(pc.iceConnectionState)
+pc.onicecandidate = event => {
+  if (event.candidate === null) {
+    document.getElementById('localSessionDescription').value = btoa(JSON.stringify(pc.localDescription))
+  }
+}
+
+pc.onnegotiationneeded = e =>
+  pc.createOffer().then(d => pc.setLocalDescription(d)).catch(log)
+
+window.sendMessage = () => {
+  let message = document.getElementById('message').value
+  if (message === '') {
+    return alert('Message must not be empty')
+  }
+
+  sendChannel.send(message)
+}
+
+window.startSession = () => {
+  let sd = document.getElementById('remoteSessionDescription').value
+  if (sd === '') {
+    return alert('Session Description must not be empty')
+  }
+
+  try {
+    pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(sd))))
+  } catch (e) {
+    alert(e)
+  }
+}
+
+</script>
