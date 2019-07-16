@@ -2,7 +2,8 @@ Browser base64 Session Description <textarea id="localSessionDescription" readon
 Golang base64 Session Description: <textarea id="remoteSessionDescription"></textarea> <br />
 <button onclick="window.startSession()"> Start Session </button> <br />
 <br />
-
+Server ID: <textarea id="serverid"></textarea> <br />
+<button onclick="window.clientInit()">Client Init</button>
 Message: <textarea id="message">This is my DataChannel message!</textarea> <br />
 <button onclick="window.sendMessage()"> Send Message </button> <br />
 <img src="#" id="stream">
@@ -10,6 +11,17 @@ Message: <textarea id="message">This is my DataChannel message!</textarea> <br /
 
 <script>
   /* eslint-env browser */
+function makeid(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+let clientId = makeid(5)
+
 
 let pc = new RTCPeerConnection({
   iceServers: [
@@ -41,6 +53,24 @@ pc.onicecandidate = event => {
 
 pc.onnegotiationneeded = e =>
   pc.createOffer().then(d => pc.setLocalDescription(d)).catch(log)
+
+window.clientInit = () => {
+  // Signal the server with init info from client
+  let ws = new WebSocket("ws://localhost:9000/client")
+  ws.onopen = function (e) {
+    clientMsg = {
+      id: clientId,
+      serverid: document.getElementById("serverid").value,
+      sdp: document.getElementById("localSessionDescription").value
+    }
+    ws.send(JSON.stringify(clientMsg))
+  }
+  ws.onmessage = function (e) {
+    console.log(e.data)
+    document.getElementById("remoteSessionDescription").value = e.data
+    window.startSession()
+  }
+}
 
 window.sendMessage = () => {
   let message = document.getElementById('message').value
