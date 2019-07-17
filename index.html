@@ -1,97 +1,114 @@
-Browser base64 Session Description <textarea id="localSessionDescription" readonly="true"></textarea> <br />
-Golang base64 Session Description: <textarea id="remoteSessionDescription"></textarea> <br />
-<button onclick="window.startSession()"> Start Session </button> <br />
-<br />
-Server ID: <textarea id="serverid"></textarea> <br />
-<button onclick="window.clientInit()">Client Init</button>
-Message: <textarea id="message">This is my DataChannel message!</textarea> <br />
-<button onclick="window.sendMessage()"> Send Message </button> <br />
-<img src="#" id="stream">
-<div id="logs"></div>
+<html>
 
-<script>
-  /* eslint-env browser */
-function makeid(length) {
-   var result           = '';
-   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-   }
-   return result;
-}
-let clientId = makeid(5)
+<head>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript" src="js/jquery.chocolat.js"></script>
+  <link rel="stylesheet" href="css/chocolat.css" type="text/css" media="screen" charset="utf-8">
+</head>
 
+<body>
+  <div id="formDiv">
+    Browser base64 Session Description <textarea id="localSessionDescription" readonly="true"></textarea> <br />
+    Golang base64 Session Description: <textarea id="remoteSessionDescription"></textarea> <br />
+    <button onclick="window.startSession()"> Start Session </button> <br />
+    <br />
+    Server ID: <textarea id="serverid"></textarea> <br />
+    <button onclick="window.clientInit()">Client Init</button>
+    Message: <textarea id="message">This is my DataChannel message!</textarea> <br />
+    <button onclick="window.sendMessage()"> Send Message </button> <br />
+  </div>
+  <img src="#" id="stream" width="1280" height="720">
+  <div id="logs"></div>
 
-let pc = new RTCPeerConnection({
-  iceServers: [
-    {
-      urls: 'stun:stun.l.google.com:19302'
+  <script>
+    /* eslint-env browser */
+    function makeid(length) {
+      var result = '';
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      var charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
     }
-  ]
-})
-let log = msg => {
-  document.getElementById('logs').innerHTML += msg + '<br>'
-}
+    let clientId = makeid(5)
 
-let sendChannel = pc.createDataChannel('foo')
-sendChannel.onclose = () => console.log('sendChannel has closed')
-sendChannel.onopen = () => console.log('sendChannel has opened')
-sendChannel.onmessage = e => {
-    console.log(e.data)
-    var imageUrl = URL.createObjectURL(e.data);
-    var img = document.querySelector( "#stream" );
-    img.src = imageUrl;
-}
 
-pc.oniceconnectionstatechange = e => log(pc.iceConnectionState)
-pc.onicecandidate = event => {
-  if (event.candidate === null) {
-    document.getElementById('localSessionDescription').value = btoa(JSON.stringify(pc.localDescription))
-  }
-}
-
-pc.onnegotiationneeded = e =>
-  pc.createOffer().then(d => pc.setLocalDescription(d)).catch(log)
-
-window.clientInit = () => {
-  // Signal the server with init info from client
-  let ws = new WebSocket("ws://localhost:9000/client")
-  ws.onopen = function (e) {
-    clientMsg = {
-      id: clientId,
-      serverid: document.getElementById("serverid").value,
-      sdp: document.getElementById("localSessionDescription").value
+    let pc = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: 'stun:stun.l.google.com:19302'
+        }
+      ]
+    })
+    let log = msg => {
+      document.getElementById('logs').innerHTML += msg + '<br>'
     }
-    ws.send(JSON.stringify(clientMsg))
-  }
-  ws.onmessage = function (e) {
-    console.log(e.data)
-    document.getElementById("remoteSessionDescription").value = e.data
-    window.startSession()
-  }
-}
 
-window.sendMessage = () => {
-  let message = document.getElementById('message').value
-  if (message === '') {
-    return alert('Message must not be empty')
-  }
+    let sendChannel = pc.createDataChannel('foo')
+    sendChannel.onclose = () => console.log('sendChannel has closed')
+    sendChannel.onopen = () => console.log('sendChannel has opened')
+    sendChannel.onmessage = e => {
+      console.log(e.data)
+      var imageUrl = URL.createObjectURL(e.data);
+      var img = document.querySelector("#stream");
+      img.src = imageUrl;
+    }
 
-  sendChannel.send(message)
-}
+    pc.oniceconnectionstatechange = e => log(pc.iceConnectionState)
+    pc.onicecandidate = event => {
+      if (event.candidate === null) {
+        document.getElementById('localSessionDescription').value = btoa(JSON.stringify(pc.localDescription))
+      }
+    }
 
-window.startSession = () => {
-  let sd = document.getElementById('remoteSessionDescription').value
-  if (sd === '') {
-    return alert('Session Description must not be empty')
-  }
+    pc.onnegotiationneeded = e =>
+      pc.createOffer().then(d => pc.setLocalDescription(d)).catch(log)
 
-  try {
-    pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(sd))))
-  } catch (e) {
-    alert(e)
-  }
-}
+    window.clientInit = () => {
+      // Signal the server with init info from client
+      let ws = new WebSocket("ws://localhost:9000/client")
+      ws.onopen = function (e) {
+        clientMsg = {
+          id: clientId,
+          serverid: document.getElementById("serverid").value,
+          sdp: document.getElementById("localSessionDescription").value
+        }
+        ws.send(JSON.stringify(clientMsg))
+      }
+      ws.onmessage = function (e) {
+        console.log(e.data)
+        document.getElementById("remoteSessionDescription").value = e.data
+        window.startSession()
+        var formDiv = document.getElementById("formDiv")
+        formDiv.style.display = "none"
+        console.log("Connected")
+      }
+    }
 
-</script>
+    window.sendMessage = () => {
+      let message = document.getElementById('message').value
+      if (message === '') {
+        return alert('Message must not be empty')
+      }
+
+      sendChannel.send(message)
+    }
+
+    window.startSession = () => {
+      let sd = document.getElementById('remoteSessionDescription').value
+      if (sd === '') {
+        return alert('Session Description must not be empty')
+      }
+
+      try {
+        pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(atob(sd))))
+      } catch (e) {
+        alert(e)
+      }
+    }
+
+  </script>
+</body>
+
+</html>
