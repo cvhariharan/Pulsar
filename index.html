@@ -67,7 +67,7 @@
 
     window.clientInit = () => {
       // Signal the server with init info from client
-      let ws = new WebSocket("ws://localhost:9000/client")
+      let ws = new WebSocket("ws://34.93.71.20:9000/client")
       ws.onopen = function (e) {
         clientMsg = {
           id: clientId,
