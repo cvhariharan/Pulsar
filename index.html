@@ -1,9 +1,7 @@
 <html>
 
 <head>
-  <script type="text/javascript" src="js/jquery.js"></script>
-  <script type="text/javascript" src="js/jquery.chocolat.js"></script>
-  <link rel="stylesheet" href="css/chocolat.css" type="text/css" media="screen" charset="utf-8">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
 
 <body>
@@ -17,7 +15,7 @@
     Message: <textarea id="message">This is my DataChannel message!</textarea> <br />
     <button onclick="window.sendMessage()"> Send Message </button> <br />
   </div>
-  <img src="#" id="stream" width="1280" height="720">
+  <img src="#" id="stream" width="640" height="480">
   <div id="logs"></div>
 
   <script>
@@ -54,6 +52,20 @@
       var img = document.querySelector("#stream");
       img.src = imageUrl;
     }
+
+    // let mouseChannel = pc.createDataChannel('mouse')
+    // mouseChannel.onclose = () => console.log('mousechannel closed')
+    // mouseChannel.onopen = () => console.log('mousechannel open')
+    // document.getElementById('stream').onmousemove = (e) => {
+    //   console.log(e.clientX + " : " + e.clientY)
+    // }
+    $("#stream").mousemove(function(event){            
+        var relX = event.pageX - $(this).offset().left
+        var relY = event.pageY - $(this).offset().top
+        var relBoxCoords = relX + "," + relY
+        console.log(relBoxCoords)
+        sendChannel.send(relBoxCoords)
+    })
 
     pc.oniceconnectionstatechange = e => log(pc.iceConnectionState)
     pc.onicecandidate = event => {
