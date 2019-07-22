@@ -30,15 +30,27 @@
       return result;
     }
     let clientId = makeid(5)
+    var ICE_config= {
+    'iceServers': [
+      {
+        'url': 'stun:stun.l.google.com:19302'
+      },
+      {
+        'url': 'turn:34.93.71.20',
+        'credential': 'password',
+        'username': 'user'
+      }
+    ]
+  }
+pc = new RTCPeerConnection(ICE_config);
 
-
-    let pc = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: 'stun:stun.l.google.com:19302'
-        }
-      ]
-    })
+    // let pc = new RTCPeerConnection({
+    //   iceServers: [
+    //     {
+    //       urls: 'stun:stun.l.google.com:19302'
+    //     }
+    //   ]
+    // })
     let log = msg => {
       document.getElementById('logs').innerHTML += msg + '<br>'
     }
@@ -53,19 +65,57 @@
       img.src = imageUrl;
     }
 
-    // let mouseChannel = pc.createDataChannel('mouse')
-    // mouseChannel.onclose = () => console.log('mousechannel closed')
-    // mouseChannel.onopen = () => console.log('mousechannel open')
-    // document.getElementById('stream').onmousemove = (e) => {
-    //   console.log(e.clientX + " : " + e.clientY)
-    // }
+    let clickChannel = pc.createDataChannel('click')
+    clickChannel.onclose = () => console.log('clickChannel closed')
+    clickChannel.onopen = () => console.log('clickChannel open')
+
+    let keyChannel = pc.createDataChannel('key')
+    keyChannel.onclose = () => console.log('keyChannel closed')
+    keyChannel.onopen = () => console.log('keyChannel open')
+    
+    $("#stream").mousedown(function(event) {
+      console.log(event.clientX + "," + event.clientY)
+      if(event.which == 1) {
+        console.log("left down")
+        clickChannel.send("ld")
+      } else if(event.which == 3) {
+        console.log("right down")
+        clickChannel.send("rd")
+      }
+    })
+    $("#stream").mouseup(function(event) {
+      console.log(event.clientX + "," + event.clientY)
+      if(event.which == 1) {
+        console.log("lu")
+        clickChannel.send("lu")
+      } else if(event.which == 3) {
+        console.log("ru")
+        clickChannel.send("ru")
+      }
+    })
+//     $("#stream").mousedown(function(ev){
+//       if(ev.which == 3)
+//       {
+//            console.log("right")
+//       }
+// })   
+
     $("#stream").mousemove(function(event){            
         var relX = event.pageX - $(this).offset().left
         var relY = event.pageY - $(this).offset().top
         var relBoxCoords = relX + "," + relY
-        console.log(relBoxCoords)
+        // console.log(relBoxCoords)
         sendChannel.send(relBoxCoords)
     })
+
+
+    document.onkeypress = function(e) {
+      get = window.event?event:e;
+      key = get.keyCode?get.keyCode:get.charCode;
+      key = String.fromCharCode(key);
+      console.log(key)
+      keyChannel.send(key)
+    }
 
     pc.oniceconnectionstatechange = e => log(pc.iceConnectionState)
     pc.onicecandidate = event => {
