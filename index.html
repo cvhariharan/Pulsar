@@ -3,6 +3,7 @@
 <head>
   <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
   <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script>
+  <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
@@ -16,7 +17,7 @@
     Message: <textarea id="message">This is my DataChannel message!</textarea> <br />
     <button onclick="window.sendMessage()"> Send Message </button> <br />
   </div>
-  <img src="#" id="stream" width="640" height="480">
+  <img src="#" id="stream" width="640" height="480" class="center">
   <div id="logs"></div>
 
   <script>
@@ -279,6 +280,8 @@
       "win_oem_clear", // [254]
       "" // [255]
     ];
+    var streamDiv = document.getElementById("stream")
+    streamDiv.style.display = "none"
     function makeid(length) {
       var result = '';
       var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -355,23 +358,7 @@
         console.log("ru")
         clickChannel.send("ru")
       }
-    })
-    // hotkeys('*', function (e) {
-    //   if (hotkeys.shift) console.log('shift is pressed!');
-    //   if (hotkeys.ctrl) console.log('ctrl is pressed!');
-    //   if (hotkeys.alt) console.log('alt is pressed!');
-    //   if (hotkeys.option) console.log('option is pressed!');
-    //   if (hotkeys.delete) console.log('control is pressed!');
-    //   if (hotkeys.cmd) console.log('cmd is pressed!');
-    //   if (hotkeys.command) console.log('command is pressed!');
-    // });
-    //     $("#stream").mousedown(function(ev){
-    //       if(ev.which == 3)
-    //       {
-    //            console.log("right")
-    //       }
-    // })   
-
+    }) 
     $("#stream").mousemove(function (event) {
       var relX = event.pageX - $(this).offset().left
       var relY = event.pageY - $(this).offset().top
@@ -415,6 +402,7 @@
         window.startSession()
         var formDiv = document.getElementById("formDiv")
         formDiv.style.display = "none"
+        streamDiv.style.display = "block"
         console.log("Connected")
       }
     }
