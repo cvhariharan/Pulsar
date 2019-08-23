@@ -17,6 +17,8 @@
       <button onclick="window.clientInit()">Client Init</button>
     </div>
     <img src="#" id="stream" width="640" height="480" class="center" />
+    Video<br />
+    <div id="remoteVideos"></div> <br />
     <div id="logs"></div>
 
     <script>
@@ -288,12 +290,12 @@
         iceServers: [
           {
             url: "stun:stun.l.google.com:19302"
-          },
-          {
-            url: "turn:server-ip",
-            credential: "password",
-            username: "user"
           }
+          // {
+          //   url: "turn:server-ip",
+          //   credential: "password",
+          //   username: "user"
+          // }
         ]
       };
 
@@ -318,6 +320,17 @@
       const dataChannelOptions = {
         maxPacketLifeTime: 200
       };
+
+      pc.addTransceiver('video', {'direction': 'sendrecv'})
+
+      pc.ontrack = function (event) {
+        var el = document.createElement(event.track.kind)
+        el.srcObject = event.streams[0]
+        el.autoplay = true
+        el.controls = true
+
+        document.getElementById('remoteVideos').appendChild(el)
+      }
 
       let sendChannel = pc.createDataChannel("foo", dataChannelOptions);
       sendChannel.onclose = () => console.log("sendChannel has closed");
@@ -389,7 +402,7 @@
 
       window.clientInit = () => {
         // Signal the server with init info from client
-        let ws = new WebSocket("ws://discoveryserver/client");
+        let ws = new WebSocket("ws://35.222.81.222:9000/client");
         ws.onopen = function(e) {
           clientMsg = {
             id: clientId,
