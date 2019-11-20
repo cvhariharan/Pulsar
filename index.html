@@ -16,12 +16,13 @@
       Server ID: <textarea id="serverid"></textarea> <br />
       <button onclick="window.clientInit()">Client Init</button>
     </div>
-    <img src="#" id="stream" width="640" height="480" class="center" />
-    Video<br />
-    <div id="remoteVideos"></div> <br />
+    <!-- <video src="#" id="stream" width="852" height="480" class="center" type="video/mp4"></video>
+    Video<br /> -->
+    <div id="stream"></div> <br />
     <div id="logs"></div>
 
     <script>
+      var mimecode = 'video/mp4; codecs="avc1.42001f"';
       /* eslint-env browser */
       var keyboardMap = [
         "", // [0]
@@ -327,20 +328,13 @@
         var el = document.createElement(event.track.kind)
         el.srcObject = event.streams[0]
         el.autoplay = true
-        el.controls = true
+        el.controls = false
 
-        document.getElementById('remoteVideos').appendChild(el)
+        document.getElementById('stream').appendChild(el)
       }
-
       let sendChannel = pc.createDataChannel("foo", dataChannelOptions);
       sendChannel.onclose = () => console.log("sendChannel has closed");
       sendChannel.onopen = () => console.log("sendChannel has opened");
-      sendChannel.onmessage = e => {
-        console.log(e.data);
-        var imageUrl = window.URL.createObjectURL(e.data);
-        var img = document.querySelector("#stream");
-        img.src = imageUrl;
-      };
 
       let clickChannel = pc.createDataChannel("click");
       clickChannel.onclose = () => console.log("clickChannel closed");
@@ -402,7 +396,7 @@
 
       window.clientInit = () => {
         // Signal the server with init info from client
-        let ws = new WebSocket("ws://35.222.81.222:9000/client");
+        let ws = new WebSocket("ws://34.93.147.116:9000/client"); //WebSocket("ws://35.204.44.44:9000/client");
         ws.onopen = function(e) {
           clientMsg = {
             id: clientId,
