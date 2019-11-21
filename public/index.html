@@ -285,14 +285,30 @@
       var http = new XMLHttpRequest();
       var url = 'http://34.93.147.116:7000';
 
-      var cUrl = window.location.href;
-      console.log(cUrl);
-
       var localSd;
       var remoteSd;
       var serverId;
 
       let clientId = makeid(5);
+
+      function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+            vars[key] = value;
+        });
+        return vars;
+      }
+      function getUrlParam(parameter, defaultvalue){
+        var urlparameter = defaultvalue;
+        if(window.location.href.indexOf(parameter) > -1){
+            urlparameter = getUrlVars()[parameter];
+            }
+        return urlparameter;
+      }
+
+      var game = getUrlParam('game','Tetris')
+      console.log(game);
+
       var ICE_config = {
         iceServers: [
           {
@@ -390,7 +406,7 @@
           .catch(log);
       window.clientInit = () => {
         console.log("clientInit()")
-        // var params = 'username=hariharan&game=Quake';
+        // var params = 'username=hariharan&game=' + game;
         // http.open('POST', url + "/create", true);
         // //Send the proper header information along with the request
         // http.setRequestHeader('Content-type', 'multipart/form-data');
