@@ -13,10 +13,10 @@
         </a>
       </ul>
     </nav>
-    <button onclick="window.stopServer()">Stop</button><br />
     <!-- <video src="#" id="stream" width="852" height="480" class="center" type="video/mp4"></video>
     Video<br /> -->
     <div id="stream" class="video"></div> <br />
+    <button onclick="window.stopServer()" style="margin-top: 20px; margin-left: auto; margin-right: auto;display: block">Stop</button><br />
     <div id="logs" style="color: red;"></div>
 
     <script>
@@ -284,6 +284,9 @@
 
       var http = new XMLHttpRequest();
       var url = 'http://34.93.147.116:7000';
+
+      var cUrl = window.location.href;
+      console.log(cUrl);
 
       var localSd;
       var remoteSd;
