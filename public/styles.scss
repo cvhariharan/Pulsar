@@ -1,0 +1,147 @@
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+.video {
+    border: 1px solid black;
+    display: block;
+    height: 320px;
+    width: 480px;
+    background-color: #555;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 130px;
+}
+
+.navigation {
+    background-color: transparent; 
+    z-index: 100;
+    grid-column: 1 / 13; 
+    position: fixed;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    height: 5.5rem;
+    transition-timing-function: ease-in;
+    transition: all 1s;
+  
+  
+    &.black {
+       background-color: black;
+    }
+  
+    &__container {
+       background-color: transparent;
+    //    margin-left: 3.8rem;
+       display: flex;
+       height: 4.4rem;
+       justify-content: flex-start;
+       align-items: center;
+       margin: 0%;
+  
+       a:first-child {
+          padding-left: .2%;
+          color: red;
+          font-size: 4rem;
+       }
+  
+       &--bellLogo {
+          cursor: pointer;
+          height: 2.2rem;
+          fill: red; 
+          width: 2.2rem;
+          padding-right: 2.5rem;
+       }
+       
+       &--userLogo {
+          margin-top: 2rem;
+          border-radius: 5px;
+          cursor: pointer;
+          background-color: rgb(201, 199, 78);
+          height: 3rem;
+          width: 3rem;
+          margin-right: .5rem;
+         
+          &:hover > .dropdownContent {
+             
+             transition: all .4s;
+             opacity: 1; 
+             visibility: visible;
+          }
+       }
+  
+       &--downArrow {
+          cursor: pointer;
+          fill: #fff; 
+          height: 1rem;
+          width: 1rem;
+          margin-right: 5.8rem;
+
+       }
+  
+       &--downArrow-2 {
+          display: none;
+          cursor: pointer;
+          fill: #fff; 
+          height: 1rem;
+          width: 1rem;
+
+       }
+  
+       &--logo { 
+          height: 3.1rem;
+          padding-right: 1rem;
+       }
+  
+       &-link {
+          font-weight: 500;
+          font-size: 1.5rem;
+          color: rgb(221, 221, 221);
+          text-decoration: none;
+          margin-right: 2rem;
+          transition: all .2s; 
+      
+          &:last-child {
+             padding-right: 2.6rem;
+          }
+  
+          &:hover {
+             color: rgb(167, 167, 167); 
+          }
+         
+       }
+  
+       &--left {
+          flex-grow: 1;
+          color: #fff;
+          padding-right: 2rem;
+          display: flex;
+          justify-content: flex-end;
+  
+          &__input {
+             font-size: 1.4rem;
+             border: none;
+             color: #fff;
+             outline: none;
+             width: 0px;
+             padding: 10px;
+             padding-right: 2rem;
+             background: black;
+             border: 1px solid #fff;
+             transition: width .5s;
+             cursor: pointer;
+             opacity: 0;
+  
+               &:focus {
+                   padding-left: 4rem;
+                   width: 22rem;
+                   cursor: text;
+                   opacity: 1;
+               }
+          }
+       }
+    }
+  
+  }

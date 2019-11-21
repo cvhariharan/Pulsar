@@ -1,0 +1,127 @@
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.video {
+  border: 1px solid black;
+  display: block;
+  height: 320px;
+  width: 480px;
+  background-color: #555;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 130px;
+}
+
+.navigation {
+  background-color: transparent;
+  z-index: 100;
+  grid-column: 1/13;
+  position: fixed;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  height: 5.5rem;
+  transition-timing-function: ease-in;
+  transition: all 1s;
+}
+.navigation.black {
+  background-color: black;
+}
+.navigation__container {
+  background-color: transparent;
+  display: flex;
+  height: 4.4rem;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0%;
+}
+.navigation__container a:first-child {
+  padding-left: 0.2%;
+  color: red;
+  font-size: 4rem;
+}
+.navigation__container--bellLogo {
+  cursor: pointer;
+  height: 2.2rem;
+  fill: red;
+  width: 2.2rem;
+  padding-right: 2.5rem;
+}
+.navigation__container--userLogo {
+  margin-top: 2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #c9c74e;
+  height: 3rem;
+  width: 3rem;
+  margin-right: 0.5rem;
+}
+.navigation__container--userLogo:hover > .dropdownContent {
+  transition: all 0.4s;
+  opacity: 1;
+  visibility: visible;
+}
+.navigation__container--downArrow {
+  cursor: pointer;
+  fill: #fff;
+  height: 1rem;
+  width: 1rem;
+  margin-right: 5.8rem;
+}
+.navigation__container--downArrow-2 {
+  display: none;
+  cursor: pointer;
+  fill: #fff;
+  height: 1rem;
+  width: 1rem;
+}
+.navigation__container--logo {
+  height: 3.1rem;
+  padding-right: 1rem;
+}
+.navigation__container-link {
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: #dddddd;
+  text-decoration: none;
+  margin-right: 2rem;
+  transition: all 0.2s;
+}
+.navigation__container-link:last-child {
+  padding-right: 2.6rem;
+}
+.navigation__container-link:hover {
+  color: #a7a7a7;
+}
+.navigation__container--left {
+  flex-grow: 1;
+  color: #fff;
+  padding-right: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+.navigation__container--left__input {
+  font-size: 1.4rem;
+  border: none;
+  color: #fff;
+  outline: none;
+  width: 0px;
+  padding: 10px;
+  padding-right: 2rem;
+  background: black;
+  border: 1px solid #fff;
+  transition: width 0.5s;
+  cursor: pointer;
+  opacity: 0;
+}
+.navigation__container--left__input:focus {
+  padding-left: 4rem;
+  width: 22rem;
+  cursor: text;
+  opacity: 1;
+}
+
+/*# sourceMappingURL=styles.css.map */

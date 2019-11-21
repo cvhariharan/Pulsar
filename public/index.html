@@ -2,24 +2,22 @@
   <head>
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="https://unpkg.com/hotkeys-js/dist/hotkeys.min.js"></script>
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" type="text/css" href="./styles.css">
   </head>
 
-  <body>
-    <div id="formDiv">
-      Browser base64 Session Description
-      <textarea id="localSessionDescription" readonly="true"></textarea> <br />
-      Golang base64 Session Description:
-      <textarea id="remoteSessionDescription"></textarea> <br />
-      <button onclick="window.startSession()">Start Session</button> <br />
-      <br />
-      Server ID: <textarea id="serverid"></textarea> <br />
-      <button onclick="window.clientInit()">Client Init</button>
-    </div>
+  <body onload="window.clientInit()" style="background-color: black;">
+    <nav class="navigation black">
+      <ul class="navigation__container">
+        <a class="navigation__container-link-active" aria-current="page">
+          <img class="navigation__container--logo" src="logo.png" alt="">
+        </a>
+      </ul>
+    </nav>
+    <button onclick="window.stopServer()">Stop</button><br />
     <!-- <video src="#" id="stream" width="852" height="480" class="center" type="video/mp4"></video>
     Video<br /> -->
-    <div id="stream"></div> <br />
-    <div id="logs"></div>
+    <div id="stream" class="video"></div> <br />
+    <div id="logs" style="color: red;"></div>
 
     <script>
       var mimecode = 'video/mp4; codecs="avc1.42001f"';
@@ -282,9 +280,14 @@
         "win_oem_clear", // [254]
         "" // [255]
       ];
-
       var streamDiv = document.getElementById("stream");
-      streamDiv.style.display = "none";
+
+      var http = new XMLHttpRequest();
+      var url = 'http://34.93.147.116:7000';
+
+      var localSd;
+      var remoteSd;
+      var serverId;
 
       let clientId = makeid(5);
       var ICE_config = {
@@ -299,7 +302,6 @@
           // }
         ]
       };
-
       function makeid(length) {
         var result = "";
         var characters =
@@ -312,38 +314,30 @@
         }
         return result;
       }
-
       pc = new RTCPeerConnection(ICE_config);
       let log = msg => {
         document.getElementById("logs").innerHTML += msg + "<br>";
       };
-
       const dataChannelOptions = {
         maxPacketLifeTime: 200
       };
-
       pc.addTransceiver('video', {'direction': 'sendrecv'})
-
       pc.ontrack = function (event) {
         var el = document.createElement(event.track.kind)
         el.srcObject = event.streams[0]
         el.autoplay = true
         el.controls = false
-
         document.getElementById('stream').appendChild(el)
       }
       let sendChannel = pc.createDataChannel("foo", dataChannelOptions);
       sendChannel.onclose = () => console.log("sendChannel has closed");
       sendChannel.onopen = () => console.log("sendChannel has opened");
-
       let clickChannel = pc.createDataChannel("click");
       clickChannel.onclose = () => console.log("clickChannel closed");
       clickChannel.onopen = () => console.log("clickChannel open");
-
       let keyChannel = pc.createDataChannel("key");
       keyChannel.onclose = () => console.log("keyChannel closed");
       keyChannel.onopen = () => console.log("keyChannel open");
-
       $("#stream").mousedown(function(event) {
         console.log(event.clientX + "," + event.clientY);
         if (event.which == 1) {
@@ -371,49 +365,70 @@
         // console.log(relBoxCoords)
         sendChannel.send(relBoxCoords);
       });
-
       document.onkeydown = function(e) {
         get = window.event ? event : e;
         key = get.keyCode ? get.keyCode : get.charCode;
         keyChannel.send(keyboardMap[get.keyCode]);
         console.log(keyboardMap[get.keyCode]);
       };
-
+      
       pc.oniceconnectionstatechange = e => log(pc.iceConnectionState);
       pc.onicecandidate = event => {
         if (event.candidate === null) {
-          document.getElementById("localSessionDescription").value = btoa(
+          localSd = btoa(
             JSON.stringify(pc.localDescription)
           );
         }
       };
-
       pc.onnegotiationneeded = e =>
         pc
           .createOffer()
           .then(d => pc.setLocalDescription(d))
           .catch(log);
-
       window.clientInit = () => {
-        // Signal the server with init info from client
-        let ws = new WebSocket("ws://34.93.147.116:9000/client"); //WebSocket("ws://35.204.44.44:9000/client");
-        ws.onopen = function(e) {
-          clientMsg = {
-            id: clientId,
-            serverid: document.getElementById("serverid").value,
-            sdp: document.getElementById("localSessionDescription").value
-          };
-          ws.send(JSON.stringify(clientMsg));
-        };
-        ws.onmessage = function(e) {
-          console.log(e.data);
-          document.getElementById("remoteSessionDescription").value = e.data;
-          window.startSession();
-          var formDiv = document.getElementById("formDiv");
-          formDiv.style.display = "none";
-          streamDiv.style.display = "block";
-          console.log("Connected");
-        };
+        console.log("clientInit()")
+        // var params = 'username=hariharan&game=Quake';
+        // http.open('POST', url + "/create", true);
+        // //Send the proper header information along with the request
+        // http.setRequestHeader('Content-type', 'multipart/form-data');
+
+        // http.onreadystatechange = function() {//Call a function when the state changes.
+        //   if(http.readyState == 4 && http.status == 200) {
+        //     console.log(http.responseText);
+        //     serverId = http.responseText;
+        //     // Signal the server with init info from client
+        //     let ws = new WebSocket("ws://34.93.147.116:9000/client"); //WebSocket("ws://35.204.44.44:9000/client");
+        //     ws.onopen = function(e) {
+        //       clientMsg = {
+        //         id: clientId,
+        //         serverid: serverId,
+        //         sdp: localSd
+        //       };
+        //       console.log(clientMsg)
+        //       ws.send(JSON.stringify(clientMsg));
+        //     };
+        //     ws.onmessage = function(e) {
+        //       console.log(e.data);
+        //       remoteSd = e.data;
+        //       window.startSession();
+        //       var formDiv = document.getElementById("formDiv");
+        //       formDiv.style.display = "none";
+        //       console.log("Connected");
+        //     };
+        //   }else{console.log(http.responseText)}
+        // };
+        // http.send(params);
+      }
+
+      window.stopServer = () =>{
+        http.open('GET', url + "/stop?id=" + serverId, true);
+
+        http.onreadystatechange = function() {//Call a function when the state changes.
+          if(http.readyState == 4 && http.status == 200) {
+             alert("Deleted")
+          }else{console.log(http.responseText)}
+        }
+        http.send();
       };
 
       window.sendMessage = () => {
@@ -421,16 +436,13 @@
         if (message === "") {
           return alert("Message must not be empty");
         }
-
         sendChannel.send(message);
       };
-
       window.startSession = () => {
-        let sd = document.getElementById("remoteSessionDescription").value;
+        let sd = remoteSd;
         if (sd === "") {
           return alert("Session Description must not be empty");
         }
-
         try {
           pc.setRemoteDescription(
             new RTCSessionDescription(JSON.parse(atob(sd)))
@@ -442,3 +454,4 @@
     </script>
   </body>
 </html>
+
